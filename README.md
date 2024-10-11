@@ -1,4 +1,5 @@
 # Weather Bot Project
+https://t.me/weather_bobr_bot
 
 ## Описание
 

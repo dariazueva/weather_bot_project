@@ -1,15 +1,10 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
-import environ
-
-env = environ.Env(
-    DEBUG=(bool, False)
-)
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
@@ -18,10 +13,10 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -37,7 +32,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'bot',
-    'logs',
     'drf_yasg',
 ]
 
@@ -78,11 +72,11 @@ WSGI_APPLICATION = 'weather_bot_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DATABASE_NAME'),
-        'USER': env('DATABASE_USER'),
-        'PASSWORD': env('DATABASE_PASSWORD'),
-        'HOST': env('DATABASE_HOST'),
-        'PORT': env('DATABASE_PORT'),
+        'NAME': os.getenv('DATABASE_NAME', ''),
+        'USER': os.getenv('DATABASE_USER', ''),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD', ''),
+        'HOST': os.getenv('DATABASE_HOST', ''),
+        'PORT': os.getenv('DATABASE_PORT', 5432),
     }
 }
 
@@ -127,7 +121,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-TELEGRAM_TOKEN = env('TELEGRAM_TOKEN')
-WEATHER_API_KEY = env('WEATHER_API_KEY')

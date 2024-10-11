@@ -7,18 +7,25 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Log',
+            name="Log",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('user_id', models.BigIntegerField()),
-                ('command', models.CharField(max_length=255)),
-                ('response', models.TextField()),
-                ('timestamp', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("user_id", models.BigIntegerField()),
+                ("command", models.CharField(max_length=255)),
+                ("response", models.TextField()),
+                ("timestamp", models.DateTimeField(auto_now_add=True)),
             ],
         ),
     ]

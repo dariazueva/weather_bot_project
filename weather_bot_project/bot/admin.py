@@ -5,4 +5,4 @@ from . import models
 
 @admin.register(models.Log)
 class LogAdmin(admin.ModelAdmin):
-    list_display = ("response", "command", "response")
+    list_display = ("user_id", "command", "timestamp", "response")

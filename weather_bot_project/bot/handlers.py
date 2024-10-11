@@ -3,15 +3,14 @@ import os
 from http import HTTPStatus
 
 import requests
+from asgiref.sync import sync_to_async
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-from asgiref.sync import sync_to_async
 
 from .models import Log
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
@@ -21,11 +20,7 @@ WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
 
 @sync_to_async
 def create_log(user_id, command, response):
-    return Log.objects.create(
-        user_id=user_id,
-        command=command,
-        response=response
-    )
+    return Log.objects.create(user_id=user_id, command=command, response=response)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -42,13 +37,11 @@ async def weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
     command = update.message.text
     args = context.args
     if not args:
-        error_message = "Пожалуйста, укажи город после команды /weather.\nПример: /weather Москва"
-        await update.message.reply_text(error_message)
-        await create_log(
-            user_id=user_id,
-            command=command,
-            response=response
+        error_message = (
+            "Пожалуйста, укажи город после команды /weather.\nПример: /weather Москва"
         )
+        await update.message.reply_text(error_message)
+        await create_log(user_id=user_id, command=command, response=response)
         return
     city = " ".join(args)
     weather_data = get_weather(city)
@@ -64,28 +57,24 @@ async def weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Скорость ветра: {weather_data['wind_speed']} м/с"
         )
     await update.message.reply_text(response)
-    await create_log(
-        user_id=user_id,
-        command=command,
-        response=response
-    )
+    await create_log(user_id=user_id, command=command, response=response)
 
 
 def get_weather(city):
-    url = (
-        f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={WEATHER_API_KEY}&units=metric&lang=ru"
-    )
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={WEATHER_API_KEY}&units=metric&lang=ru"
     try:
         response = requests.get(url)
         data = response.json()
         if response.status_code != HTTPStatus.OK:
-            return {"error": data.get("message", "Не удалось получить данные о погоде.")}
+            return {
+                "error": data.get("message", "Не удалось получить данные о погоде.")
+            }
         weather_info = {
-            'temperature': data['main']['temp'],
-            'feels_like': data['main']['feels_like'],
-            'description': data['weather'][0]['description'],
-            'humidity': data['main']['humidity'],
-            'wind_speed': data['wind']['speed'],
+            "temperature": data["main"]["temp"],
+            "feels_like": data["main"]["feels_like"],
+            "description": data["weather"][0]["description"],
+            "humidity": data["main"]["humidity"],
+            "wind_speed": data["wind"]["speed"],
         }
         return weather_info
     except Exception as e:

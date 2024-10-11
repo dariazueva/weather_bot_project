@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            logger.info('Запуск бота')
+            logger.info("Запуск бота")
             main()
         except Exception as e:
             logger.error(f"Ошибка при запуске бота: {e}")

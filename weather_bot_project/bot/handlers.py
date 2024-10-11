@@ -1,8 +1,11 @@
-import os
 import logging
+import os
+from http import HTTPStatus
+
 import requests
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+
 from .models import Log
 
 logging.basicConfig(
@@ -11,8 +14,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -28,7 +31,6 @@ async def weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     command = update.message.text
     args = context.args
-
     if not args:
         error_message = "Пожалуйста, укажи город после команды /weather.\nПример: /weather Москва"
         await update.message.reply_text(error_message)
@@ -38,12 +40,10 @@ async def weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
             response=error_message
         )
         return
-
-    city = ' '.join(args)
+    city = " ".join(args)
     weather_data = get_weather(city)
-
-    if 'error' in weather_data:
-        response = weather_data['error']
+    if "error" in weather_data:
+        response = weather_data["error"]
     else:
         response = (
             f"Погода в {city}:\n"
@@ -53,9 +53,7 @@ async def weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Влажность: {weather_data['humidity']}%\n"
             f"Скорость ветра: {weather_data['wind_speed']} м/с"
         )
-
     await update.message.reply_text(response)
-
     Log.objects.create(
         user_id=user_id,
         command=command,
@@ -70,10 +68,8 @@ def get_weather(city):
     try:
         response = requests.get(url)
         data = response.json()
-
-        if data.get('cod') != 200:
-            return {'error': data.get('message', 'Не удалось получить данные о погоде.')}
-
+        if response.status_code != HTTPStatus.OK:
+            return {"error": data.get("message", "Не удалось получить данные о погоде.")}
         weather_info = {
             'temperature': data['main']['temp'],
             'feels_like': data['main']['feels_like'],
@@ -82,16 +78,13 @@ def get_weather(city):
             'wind_speed': data['wind']['speed'],
         }
         return weather_info
-
     except Exception as e:
         logger.error(f"Ошибка при получении погоды: {e}")
-        return {'error': 'Произошла ошибка при получении данных о погоде.'}
+        return {"error": "Произошла ошибка при получении данных о погоде."}
 
 
 def main():
     app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
-
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("weather", weather))
-
     app.run_polling()

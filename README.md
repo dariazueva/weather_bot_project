@@ -52,8 +52,12 @@ DATABASE_NAME=weather_bot_db
 DATABASE_USER=adrea
 DATABASE_PASSWORD=secret
 DATABASE_HOST=localhost
-DATABASE_PORT=5432
+DATABASE_PORT=5431
+```
 
+В консоли пропишите команду для запуска контейнера базы данныхЖ
+```
+docker run --name weather_bot_db --env-file .env -p 5431:5432 postgres:13.10
 ```
 
 Установить зависимости из файла requirements.txt:

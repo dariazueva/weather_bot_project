@@ -5,6 +5,7 @@ from http import HTTPStatus
 import requests
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from asgiref.sync import sync_to_async
 
 from .models import Log
 
@@ -16,6 +17,15 @@ logger = logging.getLogger(__name__)
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
+
+
+@sync_to_async
+def create_log(user_id, command, response):
+    return Log.objects.create(
+        user_id=user_id,
+        command=command,
+        response=response
+    )
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -34,10 +44,10 @@ async def weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not args:
         error_message = "Пожалуйста, укажи город после команды /weather.\nПример: /weather Москва"
         await update.message.reply_text(error_message)
-        Log.objects.create(
+        await create_log(
             user_id=user_id,
             command=command,
-            response=error_message
+            response=response
         )
         return
     city = " ".join(args)
@@ -54,7 +64,7 @@ async def weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Скорость ветра: {weather_data['wind_speed']} м/с"
         )
     await update.message.reply_text(response)
-    Log.objects.create(
+    await create_log(
         user_id=user_id,
         command=command,
         response=response

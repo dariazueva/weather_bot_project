@@ -1,5 +1,6 @@
 # Weather Bot Project
-https://t.me/weather_bobr_bot
+https://t.me/weather_bobr_bot - бот
+https://weatherbotproject-production.up.railway.app/api/logs/ - его логи
 
 ## Описание
 
